@@ -12,7 +12,8 @@ function App() {
   return (
     <>
       <Navbar/>
-      <Manager/>
+        <Manager/>
+      <Footer/>
     </>
   )
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
-
+import { FaCopy } from "react-icons/fa";
 // Making an UI Component
 
 const Manager = () => {
@@ -19,13 +19,16 @@ const Manager = () => {
   }, []);
 
   const ref = useRef(); //used ref to directly access the src propeties of img.
+  const passwordRef = useRef()
 
   const showPassword = () => {
-    alert("show the password!!");
+    // passwordRef.current.type = "text";
     if (ref.current.src.includes("eyecross.png")) {
       ref.current.src = "/eye.png";
+      passwordRef.current.type = "password";
     } else {
       ref.current.src = "/eyecross.png";
+      passwordRef.current.type = "text";
     }
   };
 
@@ -46,7 +49,7 @@ const Manager = () => {
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-green-400 opacity-20 blur-[100px]"></div>
       </div>
 
-      <div className=" mx-auto mycontainer">
+      <div className=" mx-auto mycontainer h-[82.2vh]">
         <h1 className="text-4xl font-bold text-center">
           <span className="text-green-500"> /&lt;</span>
           Pass
@@ -79,11 +82,12 @@ const Manager = () => {
 
             <div className="relative">
               <input
+                ref={passwordRef}
                 value={form.password}
                 name="password"
                 onChange={handleChange}
                 placeholder="Enter your Password"
-                type="text"
+                type="password"
                 id=""
                 className=" rounded-full border-2 border-green-500 w-20px px-4 py-0.2 "
               />
@@ -129,7 +133,7 @@ const Manager = () => {
               <tbody className="bg-green-100">
                 {passwordArray.map((item, index) => {
                   return<tr key={index}>
-                    <td className="py-2 border-white text-center min-w-32"><a href={item.site} target="_blank">{item.site}</a></td>
+                    <td className="py-2 border-white text-center min-w-32"><a href={item.site} target="_blank">{item.site}</a><FaCopy className="h-4 inline-block w-3 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 " /></td>
                     <td className="py-2 border-white text-center min-w-32">{item.username}</td>
                     <td className="py-2 border-white text-center min-w-32">{item.password}</td>
                   </tr>;
