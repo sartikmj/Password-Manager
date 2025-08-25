@@ -1,6 +1,9 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { FaCopy } from "react-icons/fa";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+
+
 // Making an UI Component
 
 const Manager = () => {
@@ -19,7 +22,7 @@ const Manager = () => {
   }, []);
 
   const ref = useRef(); //used ref to directly access the src propeties of img.
-  const passwordRef = useRef()
+  const passwordRef = useRef();
 
   const showPassword = () => {
     // passwordRef.current.type = "text";
@@ -30,6 +33,21 @@ const Manager = () => {
       ref.current.src = "/eyecross.png";
       passwordRef.current.type = "text";
     }
+  };
+
+  const copyText = (text) => {
+    toast("🦄 Copied To Clipboard !", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+    navigator.clipboard.writeText(text);
   };
 
   const savePassword = () => {
@@ -45,6 +63,20 @@ const Manager = () => {
 
   return (
     <>
+      {/* React Toastify */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
       <div className="absolute inset-0 -z-10 h-full w-full bg-green-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-green-400 opacity-20 blur-[100px]"></div>
       </div>
@@ -132,11 +164,33 @@ const Manager = () => {
               </thead>
               <tbody className="bg-green-100">
                 {passwordArray.map((item, index) => {
-                  return<tr key={index}>
-                    <td className="py-2 border-white text-center min-w-32"><a href={item.site} target="_blank">{item.site}</a><FaCopy className="h-4 inline-block w-3 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 " /></td>
-                    <td className="py-2 border-white text-center min-w-32">{item.username}</td>
-                    <td className="py-2 border-white text-center min-w-32">{item.password}</td>
-                  </tr>;
+                  return (
+                    <tr key={index}>
+                      <td className="py-2 border-white text-center min-w-32">
+                        <a href={item.site} target="_blank">
+                          {item.site}
+                        </a>
+                        <FaCopy
+                          className=" copy h-4 inline-block w-3 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 "
+                          onClick={() => copyText(item.site)}
+                        />
+                      </td>
+                      <td className="py-2 border-white text-center min-w-32">
+                        {item.username}{" "}
+                        <FaCopy
+                          className=" copy h-4 inline-block w-3 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 "
+                          onClick={() => copyText(item.username)}
+                        />{" "}
+                      </td>
+                      <td className="py-2 border-white text-center min-w-32">
+                        {item.password}{" "}
+                        <FaCopy
+                          className=" copy h-4 inline-block w-3 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 "
+                          onClick={() => copyText(item.password)}
+                        />{" "}
+                      </td>
+                    </tr>
+                  );
                 })}
               </tbody>
             </table>
