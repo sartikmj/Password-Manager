@@ -2,7 +2,9 @@ import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { FaCopy } from "react-icons/fa";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { v4 as uuidv4 } from 'uuid';
 
 // Making an UI Component
 
@@ -52,10 +54,27 @@ const Manager = () => {
 
   const savePassword = () => {
     // console.log(form)
-    setPasswordArray([...passwordArray, form]);
-    localStorage.setItem("passwords", JSON.stringify([...passwordArray, form])); // Converts that array into a JSON string (because localStorage can only store strings).
+    setPasswordArray([...passwordArray, {...form, id: uuidv4()}]);
+    localStorage.setItem("passwords", JSON.stringify([...passwordArray, {...form, id: uuidv4()}])); // Converts that array into a JSON string (because localStorage can only store strings).
     console.log(passwordArray);
+    setForm({site:"", username:"", password:""}); //to clear the form inputs after saving the credentials.
   };
+
+  const deletePassowrd = (id) => {
+    console.log("Deleting Password with id", id)
+    let c = confirm("Are you sure you want to Delete this Password ?")
+    if(c){
+      setPasswordArray(passwordArray.filter(item=>item.id!=id))
+      localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item=>item.id!=id)));
+
+    }
+  }
+
+  const editPassword = (id) => {
+    console.log("Editing Password with id", id)
+    setForm(passwordArray.filter(item=>item.id===id)[0]) //its and array and our password is the only ele in it so to access it we need to use index 0.
+    setPasswordArray(passwordArray.filter(item=>item.id!=id))
+  }
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -146,7 +165,7 @@ const Manager = () => {
               src="https://cdn.lordicon.com/efxgwrkc.json"
               trigger="hover"
             ></lord-icon>
-            Add Password
+          Save Password
           </button>
         </div>
 
@@ -160,6 +179,7 @@ const Manager = () => {
                   <th className="py-2">Site</th>
                   <th className="py-2">Username</th>
                   <th className="py-2">Password</th>
+                  <th className="py-2">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-green-100">
@@ -188,6 +208,10 @@ const Manager = () => {
                           className=" copy h-4 inline-block w-3 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 "
                           onClick={() => copyText(item.password)}
                         />{" "}
+                      </td>
+                      <td className="py-2 border-white text-center min-w-32" >
+                        <FaEdit onClick={()=>editPassword(item.id)} className=" copy h-4 inline-block w-5 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 mx-1" />
+                        <MdDelete onClick={()=>deletePassowrd(item.id)} className=" copy h-5 inline-block w-5 ml-1 cursor-pointer transition-all duration-300 active:scale-125 active:text-green-500 mx-1" />
                       </td>
                     </tr>
                   );
