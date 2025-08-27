@@ -11,11 +11,21 @@ const Manager = () => {
     const [form, setform] = useState({ site: "", username: "", password: "" })
     const [passwordArray, setPasswordArray] = useState([])
 
+    const getPasswords = async ()=>{
+        let req = await fetch("http://localhost:3000");
+        let passwords = await req.json(); // parses the response body to json
+        console.log(passwords)
+        setPasswordArray(passwords)
+    }
+
     useEffect(() => {
-        let passwords = localStorage.getItem("passwords");
-        if (passwords) {
-            setPasswordArray(JSON.parse(passwords))
-        }
+
+        getPasswords();
+
+        // let passwords = localStorage.getItem("passwords"); 
+        // if (passwords) {
+        //     setPasswordArray(JSON.parse(passwords))
+        // }
     }, [])
 
     const copyText = (text) => {
@@ -48,12 +58,30 @@ const Manager = () => {
 
     }
 
-    const savePassword = () => {
+    const savePassword = async () => {
         if(form.site.length >3 && form.username.length >3 &&form.password.length >3){
 
+            // If any such ID already exists in the db, delete it.
+            await fetch("http://localhost:3000/",{ 
+                method:"DELETE", 
+                headers: { 
+                    "Content-Type": "application/json" //Informs the server that you are sending JSON data in the request body. Without this header, the server might not parse the data correctly.
+                },
+                body: JSON.stringify({ id: form.id }) // JSON.stringify(...) → converts the JS object into a JSON string, because HTTP request bodies must be plain text.
+            });
+
             setPasswordArray([...passwordArray, {...form, id: uuidv4()}])
-            localStorage.setItem("passwords", JSON.stringify([...passwordArray, {...form, id: uuidv4()}]))
-            console.log([...passwordArray, form])
+            await fetch("http://localhost:3000/",{ 
+                method:"POST", 
+                headers: { 
+                    "Content-Type": "application/json" //Informs the server that you are sending JSON data in the request body. Without this header, the server might not parse the data correctly.
+                },
+                body: JSON.stringify({ ...form, id: uuidv4() }) // JSON.stringify(...) → converts the JS object into a JSON string, because HTTP request bodies must be plain text.
+            });
+            
+            // localStorage.setItem("passwords", JSON.stringify([...passwordArray, {...form, id: uuidv4()}]))
+            // console.log([...passwordArray, form])
+
             setform({ site: "", username: "", password: "" })
             toast('Password Saved!');
     }
@@ -63,12 +91,21 @@ const Manager = () => {
 
     }
 
-    const deletePassword = (id) => {
+    const deletePassword = async (id) => {
         console.log("Deleting password with id ", id)
         let c = confirm("Do you really want to delete this password?")
         if(c){
             setPasswordArray(passwordArray.filter(item=>item.id!==id))
-            localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item=>item.id!==id))) 
+            let res = await fetch("http://localhost:3000/",{ 
+                method:"DELETE", 
+                headers: { 
+                    "Content-Type": "application/json" //Informs the server that you are sending JSON data in the request body. Without this header, the server might not parse the data correctly.
+                },
+                body: JSON.stringify({ id }) // JSON.stringify(...) → converts the JS object into a JSON string, because HTTP request bodies must be plain text.
+            });
+
+            // localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item=>item.id!==id))) 
+
             toast('Password Deleted!', {
                 position: "top-right",
                 autoClose: 5000,
@@ -85,7 +122,7 @@ const Manager = () => {
     const editPassword = (id) => {
          
         console.log("Editing password with id ", id)
-        setform(passwordArray.filter(i=>i.id===id)[0]) 
+        setform({...passwordArray.filter(i=>i.id===id)[0], id: id}) 
         setPasswordArray(passwordArray.filter(item=>item.id!==id)) 
 
     }
@@ -102,7 +139,7 @@ const Manager = () => {
         <>
             <ToastContainer />
             <div className="absolute inset-0 -z-10 h-full w-full bg-green-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"><div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-green-400 opacity-20 blur-[100px]"></div></div>
-            <div className=" p-3 md:mycontainer min-h-[84.6vh]  ">
+            <div className="p-[82px] md:mycontainer min-h-[84.6vh]  ">
                 <h1 className='text-4xl text font-bold text-center'>
                     <span className='text-green-500'> &lt;</span>
 
@@ -173,7 +210,7 @@ const Manager = () => {
                                     </td>
                                     <td className='py-2 border border-white text-center'>
                                         <div className='flex items-center justify-center '>
-                                            <span>{item.password}</span>
+                                            <span>{"*".repeat(item.password.length)}</span>
                                             <div className='lordiconcopy size-7 cursor-pointer' onClick={() => { copyText(item.password) }}>
                                                 <lord-icon
                                                     style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "3px" }}

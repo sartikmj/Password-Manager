@@ -28,7 +28,8 @@ const Navbar = () => {
             alt="github logo"
           />
           <span className="font-bold px-2">GitHub</span>
-        </button>
+          <p>know the creator</p>
+        </button> 
       </div>
     </nav>
   );
